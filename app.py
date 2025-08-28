@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
+import pandas as pd
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 from matplotlib import rcParams
 
@@ -112,6 +114,39 @@ if uploaded_file is not None:
         with col5:
             st.markdown("<h4 style='color:blue;'>🖼🔗 Links</h4>", unsafe_allow_html=True)
             st.markdown(f"<h2 style='color:black;'>{num_links}</h2>", unsafe_allow_html=True)
+        analyzer = SentimentIntensityAnalyzer()
+
+        # Filter by selected user
+        if selected_user != "🌍 Overall":
+            temp_df = df[df['user'] == selected_user]
+        else:
+            temp_df = df.copy()
+
+        sentiments = {"Positive": 0, "Negative": 0, "Neutral": 0}
+        scores = []
+
+        for message in temp_df['message']:
+            if message not in ["<Media omitted>", "This message was deleted"]:
+                vs = analyzer.polarity_scores(str(message))
+                scores.append(vs['compound'])
+                if vs['compound'] >= 0.05:
+                    sentiments["Positive"] += 1
+                elif vs['compound'] <= -0.05:
+                    sentiments["Negative"] += 1
+                else:
+                    sentiments["Neutral"] += 1
+
+        sentiment_df = pd.DataFrame(sentiments.items(), columns=["Sentiment", "Count"])
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.dataframe(sentiment_df)
+        with col2:
+            fig, ax = plt.subplots()
+            cmap = cm.get_cmap('Set2')
+            colors = cmap(np.linspace(0, 1, len(sentiment_df)))
+            ax.pie(sentiment_df["Count"], labels=sentiment_df["Sentiment"], autopct="%0.1f%%", colors=colors)
+            st.pyplot(fig)
         if selected_user == '🌍 Overall':
             x, new_df = helper.fetch_most_bysy_users(df)
             st.markdown(
@@ -209,3 +244,4 @@ if uploaded_file is not None:
             ax.bar(busy_month.index, busy_month.values, color="orange")
             plt.xticks(rotation="vertical")
             st.pyplot(fig)
+
