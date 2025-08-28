@@ -117,6 +117,10 @@ if uploaded_file is not None:
         analyzer = SentimentIntensityAnalyzer()
 
         # Filter by selected user
+        st.markdown(
+                "<h3 style='color:crimson; text-align:center; font-weight:bold;'>Group Sentiment</h3>",
+                unsafe_allow_html=True
+            )
         if selected_user != "🌍 Overall":
             temp_df = df[df['user'] == selected_user]
         else:
@@ -244,5 +248,6 @@ if uploaded_file is not None:
             ax.bar(busy_month.index, busy_month.values, color="orange")
             plt.xticks(rotation="vertical")
             st.pyplot(fig)
+
 
 
