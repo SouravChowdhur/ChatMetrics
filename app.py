@@ -144,7 +144,7 @@ if uploaded_file is not None:
         with col2:
             fig, ax = plt.subplots()
             cmap = cm.get_cmap('Set2')
-            colors = cmap(np.linspace(0, 1, len(sentiment_df)))
+            colors = ["green", "red", "yellow"]
             ax.pie(sentiment_df["Count"], labels=sentiment_df["Sentiment"], autopct="%0.1f%%", colors=colors)
             st.pyplot(fig)
         if selected_user == '🌍 Overall':
@@ -244,4 +244,5 @@ if uploaded_file is not None:
             ax.bar(busy_month.index, busy_month.values, color="orange")
             plt.xticks(rotation="vertical")
             st.pyplot(fig)
+
 
